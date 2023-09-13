@@ -64,7 +64,6 @@
           };
 
         pkgs = makePkgs {};
-        inherit (pkgs) stdenv lib;
 
         make-ghcid-ng = pkgs:
           pkgs.callPackage ./nix/ghcid-ng.nix {} {
@@ -82,25 +81,14 @@
       in {
         inherit (ghcid-ng) checks;
 
-        packages =
-          {
-            inherit ghcid-ng;
-            default = ghcid-ng;
-            ghcid-ng-tests = ghcid-ng.checks.ghcid-ng-tests;
+        packages = {
+          inherit ghcid-ng;
+          default = ghcid-ng;
+          ghcid-ng-tests = ghcid-ng.checks.ghcid-ng-tests;
 
-            get-crate-version = pkgs.callPackage ./nix/get-crate-version.nix {};
-            make-release-commit = pkgs.callPackage ./nix/make-release-commit.nix {};
-          }
-          // (lib.optionalAttrs stdenv.isLinux {
-            # ghcid-ng cross-compiled to aarch64-linux.
-            ghcid-ng-aarch64-linux = let
-              crossPkgs = makePkgs {crossSystem = "aarch64-linux";};
-            in
-              (make-ghcid-ng crossPkgs).overrideAttrs (old: {
-                CARGO_BUILD_TARGET = "aarch64-unknown-linux-musl";
-                CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_LINKER = "${crossPkgs.stdenv.cc.targetPrefix}cc";
-              });
-          });
+          get-crate-version = pkgs.callPackage ./nix/get-crate-version.nix {};
+          make-release-commit = pkgs.callPackage ./nix/make-release-commit.nix {};
+        };
 
         apps.default = flake-utils.lib.mkApp {drv = ghcid-ng;};
 
