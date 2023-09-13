@@ -15,7 +15,7 @@ on:
     branches:
       - main
 
-name: Update versions and release
+name: Update versions and create release PR
 
 jobs:
   # We make `if_merged` a `needs:` of the other jobs here to only run this
@@ -56,7 +56,7 @@ jobs:
           fi
 
   version:
-    name: Update and tag version numbers
+    name: Bump version and create release PR
     needs:
       - if_merged
       - bump_type
