@@ -90,7 +90,7 @@ jobs:
         if: runner.os == 'macOS'
         run: cargo build --release --target aarch64-apple-darwin
 
-      - name: Create macOS universal executable and codesign it
+      - name: Create macOS universal executable
         if: runner.os == 'macOS'
         run: |
           lipo -create -output target/release/ghcid-ng-macos \
