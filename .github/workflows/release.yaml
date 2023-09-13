@@ -105,17 +105,26 @@ jobs:
             extra-experimental-features = nix-command flakes
             accept-flake-config = true
 
+      - name: Create target directory (Linux)
+        if: runner.os == 'Linux'
+        run: mkdir -p target/
+
       - name: Build (Linux, x86_64)
         if: runner.os == 'Linux'
         run: |
+          mkdir -p target/
           nix build --print-build-logs .#ghcid-ng
-          cp result/bin/ghcid-ng ghcid-ng-x86_64-linux
+          cp result/bin/ghcid-ng target/ghcid-ng-x86_64-linux
 
       - name: Build (Linux, aarch64)
         if: runner.os == 'Linux'
         run: |
           nix build --print-build-logs .#ghcid-ng-aarch64-linux
-          cp result/bin/ghcid-ng ghcid-ng-aarch64-linux
+          cp result/bin/ghcid-ng target/ghcid-ng-aarch64-linux
+
+      - name: Remove result symlink
+        if: runner.os == 'Linux'
+        run: rm -f result
 
       - name: Upload macOS executable
         uses: actions/upload-artifact@v3
@@ -130,8 +139,8 @@ jobs:
         with:
           name: linux
           path: |
-            ghcid-ng-x86_64-linux
-            ghcid-ng-aarch64-linux
+            target/ghcid-ng-x86_64-linux
+            target/ghcid-ng-aarch64-linux
 
       - name: Publish to crates.io
         if: runner.os == 'Linux'
